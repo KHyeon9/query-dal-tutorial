@@ -13,6 +13,10 @@ java {
 	}
 }
 
+ext {
+	queryDslVersion = "5.1.0"
+}
+
 configurations {
 	compileOnly {
 		extendsFrom annotationProcessor
@@ -24,16 +28,55 @@ repositories {
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	// Web
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+
+	// JPA
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+	// Lombok
 	compileOnly 'org.projectlombok:lombok'
-	developmentOnly 'org.springframework.boot:spring-boot-devtools'
-	runtimeOnly 'com.h2database:h2'
 	annotationProcessor 'org.projectlombok:lombok'
+
+	// Devtool
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+	// H2
+	runtimeOnly 'com.h2database:h2'
+
+	// QueryDSL
+	implementation "com.querydsl:querydsl-jpa:${queryDslVersion}:jakarta"
+	annotationProcessor "com.querydsl:querydsl-apt:${queryDslVersion}:jakarta"
+	// Jakarta EE에서 사용되는 표준 애노테이션들에 대한 API 제공
+	annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+	// JPA 애노테이션 (@Entity, @id, @GeneratedValue 등)을 Jakarta 패키지로 제공하는 역할
+	annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+
+	// Test
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+// QueryDSL 플로그인 설정
+// QueryDSL로 생성된 소스가 저장되는 위치(Q 클래스 파일 생성 경로로 지정)
+def querydslDir = layout.buildDirectory.dir("/generated/querydsl").get().asFile
+
+// 생성된 Q파일을 Java 소스처럼 컴파일 대상에 포함시키는 설정
+sourceSets {
+	main.java.srcDirs += querydslDir
+}
+
+// JavaCompile 작업이 실행될 때,
+// 어노테이션 프로세서가 생성한 파일들(Q 클래스 등) 을 querydslDir에 생성하게 설정
+tasks.withType(JavaCompile) {
+	options.getGeneratedSourceOutputDirectory().set(file(querydslDir))
+}
+
+// clean 시 디렉터리 삭제
+clean.doLast {
+	file(querydslDir).deleteDir()
 }
