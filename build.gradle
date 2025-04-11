@@ -52,6 +52,9 @@ dependencies {
 	// JPA 애노테이션 (@Entity, @id, @GeneratedValue 등)을 Jakarta 패키지로 제공하는 역할
 	annotationProcessor "jakarta.persistence:jakarta.persistence-api"
 
+	// P6Spy
+	implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.9.0'
+
 	// Test
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'

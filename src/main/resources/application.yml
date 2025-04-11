@@ -14,10 +14,10 @@ spring:
   jpa:
     database: h2
     generate-ddl: true
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-        highlight_sql: true
+    #    show-sql: true
+    #    properties:
+    #      hibernate:
+    #        format_sql: true
+    #        highlight_sql: true
     hibernate:
       ddl-auto: create
