@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 
@@ -13,11 +14,13 @@ import static org.assertj.core.api.Assertions.*;
 
 
 @SpringBootTest
+@Transactional // 각 테스트에 transactional을 붙이는 것과 같은 효과
 @ActiveProfiles("test")
 class UserRepositoryTest {
     @Autowired
     private UserRepository userRepository;
 
+    // @Transactional + @Test 조합은 실패시 자동으로 rollback을 발생
     @Test
     @DisplayName("회원 생성")
     void cresteUser() {
