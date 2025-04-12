@@ -40,4 +40,15 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
                 .from(qslUser)
                 .fetchOne();
     }
+
+    @Override
+    public SiteUser getQslOldestUser() {
+        QSiteUser qslUser = QSiteUser.siteUser;
+
+        return queryFactory
+                .selectFrom(qslUser)
+                .orderBy(qslUser.id.asc())
+                .limit(1)
+                .fetchOne();
+    }
 }

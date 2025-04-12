@@ -72,4 +72,15 @@ class UserRepositoryTest {
 
         assertThat(count).isEqualTo(2);
     }
+
+    @Test
+    @DisplayName("가장 오래된 회원 조회")
+    void oldestUserCount() {
+        SiteUser user = userRepository.getQslOldestUser();
+
+        assertThat(user.getId()).isEqualTo(1L);
+        assertThat(user.getUsername()).isEqualTo("user1");
+        assertThat(user.getPassword()).isEqualTo("{noop}1234");
+        assertThat(user.getEmail()).isEqualTo("user1@email.com");
+    }
 }
