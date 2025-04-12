@@ -5,6 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Arrays;
 
@@ -12,6 +13,7 @@ import static org.assertj.core.api.Assertions.*;
 
 
 @SpringBootTest
+@ActiveProfiles("test")
 class UserRepositoryTest {
     @Autowired
     private UserRepository userRepository;
@@ -20,22 +22,22 @@ class UserRepositoryTest {
     @DisplayName("회원 생성")
     void cresteUser() {
         // {noop} : 비밀번호를 암호화하지 않고 사용
-        SiteUser user1 = new SiteUser(
+        SiteUser user3 = new SiteUser(
                 null,
-                "user1",
+                "user3",
                 "{noop}1234",
-                "user1@email.com"
+                "user3@email.com"
         );
 
-        SiteUser user2 = new SiteUser(
+        SiteUser user4 = new SiteUser(
                 null,
-                "user2",
+                "user4",
                 "{noop}1234",
-                "user2@email.com"
+                "user4@email.com"
         );
 
-        userRepository.saveAll(Arrays.asList(user1, user2));
-        assertThat(userRepository.findAll().size()).isEqualTo(2);
+        userRepository.saveAll(Arrays.asList(user3, user4));
+        assertThat(userRepository.findAll().size()).isEqualTo(4);
     }
 
     @Test
