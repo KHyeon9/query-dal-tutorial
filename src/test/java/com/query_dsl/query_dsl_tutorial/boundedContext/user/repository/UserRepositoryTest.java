@@ -5,9 +5,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -122,6 +127,35 @@ class UserRepositoryTest {
         assertThat(userList.size()).isEqualTo(1);
         user = userList.get(0);
 
+        assertThat(user.getId()).isEqualTo(2L);
+        assertThat(user.getUsername()).isEqualTo("user2");
+        assertThat(user.getPassword()).isEqualTo("{noop}1234");
+        assertThat(user.getEmail()).isEqualTo("user2@email.com");
+    }
+
+    @Test
+    @DisplayName("회원 페이지로 조회")
+    void pageUserFind() {
+        long totalCount = userRepository.count();
+        int pageSize = 1; // 한 페이지에 보여줄 아이템 개수
+        int totalPages = (int) Math.ceil(totalCount / (double) pageSize);
+        int page = 1; // 현재 페이지
+        String keyword = "user";
+
+        List<Sort.Order> sorts = new ArrayList<>();
+        sorts.add(new Sort.Order(Sort.Direction.ASC, "id"));
+        // 한 페이지당 몇 개를 보여줄지
+        Pageable pageable = PageRequest.of(page, pageSize, Sort.by(sorts));
+        Page<SiteUser> usersPage = userRepository.searchQslUsers(keyword, pageable);
+
+        assertThat(usersPage.getTotalPages()).isEqualTo(totalPages);
+        assertThat(usersPage.getNumber()).isEqualTo(page);
+        assertThat(usersPage.getSize()).isEqualTo(pageSize);
+
+        List<SiteUser> users = usersPage.get().toList();
+        assertThat(users.size()).isEqualTo(pageSize);
+
+        SiteUser user = users.get(0);
         assertThat(user.getId()).isEqualTo(2L);
         assertThat(user.getUsername()).isEqualTo("user2");
         assertThat(user.getPassword()).isEqualTo("{noop}1234");
