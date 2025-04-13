@@ -9,6 +9,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -75,12 +76,32 @@ class UserRepositoryTest {
 
     @Test
     @DisplayName("가장 오래된 회원 조회")
-    void oldestUserCount() {
+    void oldestUserFind() {
         SiteUser user = userRepository.getQslOldestUser();
 
         assertThat(user.getId()).isEqualTo(1L);
         assertThat(user.getUsername()).isEqualTo("user1");
         assertThat(user.getPassword()).isEqualTo("{noop}1234");
         assertThat(user.getEmail()).isEqualTo("user1@email.com");
+    }
+
+    @Test
+    @DisplayName("전체 회원 오래된 순서로 조회")
+    void oldUserFindAll() {
+        List<SiteUser> userList = userRepository.getQslOldAscUsers();
+
+        SiteUser user1 = userList.get(0);
+
+        assertThat(user1.getId()).isEqualTo(1L);
+        assertThat(user1.getUsername()).isEqualTo("user1");
+        assertThat(user1.getPassword()).isEqualTo("{noop}1234");
+        assertThat(user1.getEmail()).isEqualTo("user1@email.com");
+
+        SiteUser user2 = userList.get(1);
+
+        assertThat(user2.getId()).isEqualTo(2L);
+        assertThat(user2.getUsername()).isEqualTo("user2");
+        assertThat(user2.getPassword()).isEqualTo("{noop}1234");
+        assertThat(user2.getEmail()).isEqualTo("user2@email.com");
     }
 }

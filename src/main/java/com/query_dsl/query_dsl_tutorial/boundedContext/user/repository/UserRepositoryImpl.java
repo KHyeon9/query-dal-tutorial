@@ -5,6 +5,8 @@ import com.query_dsl.query_dsl_tutorial.boundedContext.user.entity.SiteUser;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
+
 // QueryDSL의 구현체
 @RequiredArgsConstructor
 public class UserRepositoryImpl implements UserRepositoryCustom {
@@ -50,5 +52,15 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
                 .orderBy(qslUser.id.asc())
                 .limit(1)
                 .fetchOne();
+    }
+
+    @Override
+    public List<SiteUser> getQslOldAscUsers() {
+        QSiteUser qslUser = QSiteUser.siteUser;
+
+        return queryFactory
+                .selectFrom(qslUser)
+                .orderBy(qslUser.id.asc())
+                .fetch();
     }
 }

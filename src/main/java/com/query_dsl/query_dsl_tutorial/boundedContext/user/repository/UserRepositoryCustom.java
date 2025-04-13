@@ -2,6 +2,8 @@ package com.query_dsl.query_dsl_tutorial.boundedContext.user.repository;
 
 import com.query_dsl.query_dsl_tutorial.boundedContext.user.entity.SiteUser;
 
+import java.util.List;
+
 public interface UserRepositoryCustom {
 
     SiteUser getQslUser(Long id);
@@ -9,4 +11,6 @@ public interface UserRepositoryCustom {
     long getQslCount();
 
     SiteUser getQslOldestUser();
+
+    List<SiteUser> getQslOldAscUsers();
 }
