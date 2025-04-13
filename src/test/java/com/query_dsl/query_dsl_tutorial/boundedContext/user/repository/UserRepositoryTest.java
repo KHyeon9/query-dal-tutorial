@@ -104,4 +104,27 @@ class UserRepositoryTest {
         assertThat(user2.getPassword()).isEqualTo("{noop}1234");
         assertThat(user2.getEmail()).isEqualTo("user2@email.com");
     }
+
+    @Test
+    @DisplayName("username 또는 email로 user 검색")
+    void searchUserByUsernameAndEmail() {
+        // user1의 username으로 검색
+        List<SiteUser> userList = userRepository.searchQslUsers("user1");
+        SiteUser user = userList.get(0);
+
+        assertThat(user.getId()).isEqualTo(1L);
+        assertThat(user.getUsername()).isEqualTo("user1");
+        assertThat(user.getPassword()).isEqualTo("{noop}1234");
+        assertThat(user.getEmail()).isEqualTo("user1@email.com");
+        
+        // user2의 email로 검색
+        userList = userRepository.searchQslUsers("user2@email.com");
+        assertThat(userList.size()).isEqualTo(1);
+        user = userList.get(0);
+
+        assertThat(user.getId()).isEqualTo(2L);
+        assertThat(user.getUsername()).isEqualTo("user2");
+        assertThat(user.getPassword()).isEqualTo("{noop}1234");
+        assertThat(user.getEmail()).isEqualTo("user2@email.com");
+    }
 }

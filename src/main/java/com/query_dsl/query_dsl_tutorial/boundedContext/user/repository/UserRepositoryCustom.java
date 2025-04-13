@@ -13,4 +13,6 @@ public interface UserRepositoryCustom {
     SiteUser getQslOldestUser();
 
     List<SiteUser> getQslOldAscUsers();
+
+    List<SiteUser> searchQslUsers(String keyword);
 }
