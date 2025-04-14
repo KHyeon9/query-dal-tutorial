@@ -2,15 +2,18 @@ package com.query_dsl.query_dsl_tutorial.boundedContext.user.repository;
 
 import com.query_dsl.query_dsl_tutorial.boundedContext.user.entity.QSiteUser;
 import com.query_dsl.query_dsl_tutorial.boundedContext.user.entity.SiteUser;
-import com.querydsl.core.QueryResults;
+import com.querydsl.core.types.Order;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.PathBuilder;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.support.PageableExecutionUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 // QueryDSL의 구현체
@@ -41,76 +44,97 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
 
     @Override
     public long getQslCount() {
-        QSiteUser qslUser = QSiteUser.siteUser;
+        QSiteUser siteUser = QSiteUser.siteUser;
 
         return queryFactory
-                .select(qslUser.count())
-                .from(qslUser)
+                .select(siteUser.count())
+                .from(siteUser)
                 .fetchOne();
     }
 
     @Override
     public SiteUser getQslOldestUser() {
-        QSiteUser qslUser = QSiteUser.siteUser;
+        QSiteUser siteUser = QSiteUser.siteUser;
 
         return queryFactory
-                .selectFrom(qslUser)
-                .orderBy(qslUser.id.asc())
+                .selectFrom(siteUser)
+                .orderBy(siteUser.id.asc())
                 .limit(1)
                 .fetchOne();
     }
 
     @Override
     public List<SiteUser> getQslOldAscUsers() {
-        QSiteUser qslUser = QSiteUser.siteUser;
+        QSiteUser siteUser = QSiteUser.siteUser;
 
         return queryFactory
-                .selectFrom(qslUser)
-                .orderBy(qslUser.id.asc())
+                .selectFrom(siteUser)
+                .orderBy(siteUser.id.asc())
                 .fetch();
     }
 
     @Override
     public List<SiteUser> searchQslUsers(String keyword) {
-        QSiteUser qslUser = QSiteUser.siteUser;
+        QSiteUser siteUser = QSiteUser.siteUser;
 
         return queryFactory
-                .selectFrom(qslUser)
+                .selectFrom(siteUser)
                 .where(
-                        qslUser.username.contains(keyword)
-                                .or(qslUser.email.contains(keyword))
+                        siteUser.username.contains(keyword)
+                                .or(siteUser.email.contains(keyword))
                 )
                 .fetch();
     }
 
     @Override
     public Page<SiteUser> searchQslUsers(String keyword, Pageable pageable) {
-        QSiteUser qslUser = QSiteUser.siteUser;
+        QSiteUser siteUser = QSiteUser.siteUser;
 
         // 검색 조건
         // BooleanExpression: 검색 조건을 처리하는 객체
         // containsIgnoreCase: 대소문자 구분 X
-        BooleanExpression predicate = qslUser
+        BooleanExpression predicate = siteUser
                 .username.containsIgnoreCase(keyword)
-                .or(qslUser.email.containsIgnoreCase(keyword));
+                .or(siteUser.email.containsIgnoreCase(keyword));
         
         // 페이징 조회
         // QueryResults: 쿼리 실행 결과와 함께 페이징을 위한 추가 정보 포함
-        QueryResults<SiteUser> queryResults = queryFactory
-                .selectFrom(qslUser)
+        JPAQuery<SiteUser> usersQuery = queryFactory
+                .selectFrom(siteUser)
                 .where(predicate)
-                .orderBy(qslUser.id.asc())
                 .offset(pageable.getOffset()) // 시작 위치 (limit {여기} {?} 시작 위치)
-                .limit(pageable.getPageSize()) // 페이지 크기 (limit {?} {여기} 끝나는 위치)
-                .fetchResults(); // 데이터와 총 데이터 수를 가져옴
+                .limit(pageable.getPageSize()); // 페이지 크기 (limit {?} {여기} 끝나는 위치)
+
+        // pageable에 포함된 정렬 조건 기반으로 동적 쿼리 추가
+        List<OrderSpecifier<?>> orderSpecifiers = new ArrayList<>();
+
+        // 전달된 정렬 조건을 하나씩 꺼냄
+        pageable.getSort().forEach(order -> {
+            // order.getProperty()로 꺼낸 값들을 queryDsl이 이해할 수 있도록 builder에 담음
+            PathBuilder pathBuilder = new PathBuilder(SiteUser.class, siteUser.getMetadata());
+            orderSpecifiers.add(
+                    new OrderSpecifier(
+                            // 정렬 방향에 따른 값 변경
+                            order.isAscending() ? Order.ASC : Order.DESC,
+                            // 정렬 대상 필드를 가져옴 (id etc..)
+                            pathBuilder.get(order.getProperty())
+                    )
+            );
+        });
+        
+        // 조건을 모아서 oderBy로 정렬
+        usersQuery.orderBy(orderSpecifiers.toArray(OrderSpecifier[]::new));
 
         // 조회 결과를 리스트로
-        List<SiteUser> users = queryResults.getResults();
+        List<SiteUser> users = usersQuery.fetch();
 
         // 총 페이지 조회
-        long total = queryResults.getTotal();
+        JPAQuery<Long> usersCountQuery = queryFactory
+                .select(siteUser.count())
+                .from(siteUser)
+                .where(predicate);
 
         // PageImpl: 페이징된 데이터와 메타 데이터(전체 갯수, 페이지 정보)를 포함
-        return new PageImpl<>(users, pageable, total);
+        return new PageImpl<>(users, pageable, usersCountQuery.fetchOne());
     }
 }

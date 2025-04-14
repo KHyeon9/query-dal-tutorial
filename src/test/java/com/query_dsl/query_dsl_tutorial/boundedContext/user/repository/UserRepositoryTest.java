@@ -161,4 +161,33 @@ class UserRepositoryTest {
         assertThat(user.getPassword()).isEqualTo("{noop}1234");
         assertThat(user.getEmail()).isEqualTo("user2@email.com");
     }
+
+    @Test
+    @DisplayName("회원 페이지로 역순 조회")
+    void pageUserDescFind() {
+        long totalCount = userRepository.count();
+        int pageSize = 1; // 한 페이지에 보여줄 아이템 개수
+        int totalPages = (int) Math.ceil(totalCount / (double) pageSize);
+        int page = 1; // 현재 페이지
+        String keyword = "user";
+
+        List<Sort.Order> sorts = new ArrayList<>();
+        sorts.add(new Sort.Order(Sort.Direction.DESC, "id"));
+
+        Pageable pageable = PageRequest.of(page, pageSize, Sort.by(sorts));
+        Page<SiteUser> usersPage = userRepository.searchQslUsers(keyword, pageable);
+
+        assertThat(usersPage.getTotalPages()).isEqualTo(totalPages);
+        assertThat(usersPage.getNumber()).isEqualTo(page);
+        assertThat(usersPage.getSize()).isEqualTo(pageSize);
+
+        List<SiteUser> users = usersPage.get().toList();
+        assertThat(users.size()).isEqualTo(pageSize);
+
+        SiteUser user = users.get(0);
+        assertThat(user.getId()).isEqualTo(1L);
+        assertThat(user.getUsername()).isEqualTo("user1");
+        assertThat(user.getPassword()).isEqualTo("{noop}1234");
+        assertThat(user.getEmail()).isEqualTo("user1@email.com");
+    }
 }
