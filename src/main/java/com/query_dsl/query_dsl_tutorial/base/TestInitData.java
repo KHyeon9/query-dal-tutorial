@@ -19,19 +19,17 @@ public class TestInitData {
     CommandLineRunner init(UserRepository userRepository) {
         return args -> {
             // 이 부분은 Spring boot 앱이 실행되고, 본격적으로 작동하기 전 실행
-            SiteUser user1 = new SiteUser(
-                    null,
-                    "user1",
-                    "{noop}1234",
-                    "user1@email.com"
-            );
+            SiteUser user1 = SiteUser.builder()
+                    .username("user1")
+                    .password("{noop}1234")
+                    .email("user1@email.com")
+                    .build();
 
-            SiteUser user2 = new SiteUser(
-                    null,
-                    "user2",
-                    "{noop}1234",
-                    "user2@email.com"
-            );
+            SiteUser user2 = SiteUser.builder()
+                    .username("user2")
+                    .password("{noop}1234")
+                    .email("user2@email.com")
+                    .build();
 
             List<SiteUser> users = userRepository.saveAll(Arrays.asList(user1, user2));
         };

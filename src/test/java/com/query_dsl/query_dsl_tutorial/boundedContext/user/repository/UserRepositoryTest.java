@@ -31,19 +31,17 @@ class UserRepositoryTest {
     @DisplayName("회원 생성")
     void cresteUser() {
         // {noop} : 비밀번호를 암호화하지 않고 사용
-        SiteUser user3 = new SiteUser(
-                null,
-                "user3",
-                "{noop}1234",
-                "user3@email.com"
-        );
+        SiteUser user3 = SiteUser.builder()
+                .username("user3")
+                .password("password")
+                .email("user3@gmail.com")
+                .build();
 
-        SiteUser user4 = new SiteUser(
-                null,
-                "user4",
-                "{noop}1234",
-                "user4@email.com"
-        );
+        SiteUser user4 = SiteUser.builder()
+                .username("user4")
+                .password("password")
+                .email("user4@gmail.com")
+                .build();
 
         userRepository.saveAll(Arrays.asList(user3, user4));
         assertThat(userRepository.findAll().size()).isEqualTo(4);
@@ -189,5 +187,21 @@ class UserRepositoryTest {
         assertThat(user.getUsername()).isEqualTo("user1");
         assertThat(user.getPassword()).isEqualTo("{noop}1234");
         assertThat(user.getEmail()).isEqualTo("user1@email.com");
+    }
+
+    @Test
+    @DisplayName("회원에게 관심사 등록(중복 X)")
+    void userInterestUpdate() {
+        SiteUser user = userRepository.getQslUser(2L);
+        user.addInterestKeword("테니스");
+        user.addInterestKeword("테니스");
+        user.addInterestKeword("오버워치2");
+        user.addInterestKeword("오버워치2");
+        user.addInterestKeword("헬스");
+        user.addInterestKeword("헬스");
+
+        userRepository.save(user);
+
+        assertThat(user.getInterestKeywords().size()).isEqualTo(3);
     }
 }
