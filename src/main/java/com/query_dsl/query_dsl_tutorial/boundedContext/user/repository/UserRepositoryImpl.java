@@ -1,5 +1,7 @@
 package com.query_dsl.query_dsl_tutorial.boundedContext.user.repository;
 
+import com.query_dsl.query_dsl_tutorial.boundedContext.interestKeyword.InterestKeyword;
+import com.query_dsl.query_dsl_tutorial.boundedContext.interestKeyword.QInterestKeyword;
 import com.query_dsl.query_dsl_tutorial.boundedContext.user.entity.QSiteUser;
 import com.query_dsl.query_dsl_tutorial.boundedContext.user.entity.SiteUser;
 import com.querydsl.core.types.Order;
@@ -136,5 +138,17 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
 
         // PageImpl: 페이징된 데이터와 메타 데이터(전체 갯수, 페이지 정보)를 포함
         return new PageImpl<>(users, pageable, usersCountQuery.fetchOne());
+    }
+
+    @Override
+    public List<SiteUser> getQslUserByInterestKeyword(String keyword) {
+        QSiteUser su = QSiteUser.siteUser;
+        QInterestKeyword suik = QInterestKeyword.interestKeyword;
+
+        return queryFactory
+                .selectFrom(su)
+                .innerJoin(su.interestKeywords, suik) // INNER JOIN site_user_interest_keywords AS suik
+                .where(suik.keyword.eq(keyword)) // WHERE suik.keyword = keyword
+                .fetch();
     }
 }

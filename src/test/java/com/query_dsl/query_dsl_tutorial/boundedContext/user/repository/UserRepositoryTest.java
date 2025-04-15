@@ -204,4 +204,22 @@ class UserRepositoryTest {
 
         assertThat(user.getInterestKeywords().size()).isEqualTo(3);
     }
+
+    @Test
+    @DisplayName("런닝에 관심이 있는 회원 검색")
+    void runningUserFind() {
+        SiteUser user = userRepository.getQslUser(2L);
+        user.addInterestKeword("런닝");
+        userRepository.save(user);
+
+        List<SiteUser> users = userRepository.getQslUserByInterestKeyword("런닝");
+
+        assertThat(users.size()).isEqualTo(1);
+        SiteUser findUser = users.get(0);
+
+        assertThat(findUser.getId()).isEqualTo(2L);
+        assertThat(findUser.getUsername()).isEqualTo("user2");
+        assertThat(findUser.getPassword()).isEqualTo("{noop}1234");
+        assertThat(findUser.getEmail()).isEqualTo("user2@email.com");
+    }
 }
