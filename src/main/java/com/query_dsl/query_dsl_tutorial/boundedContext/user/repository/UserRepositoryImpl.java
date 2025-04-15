@@ -18,6 +18,9 @@ import org.springframework.data.domain.Pageable;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.query_dsl.query_dsl_tutorial.boundedContext.interestKeyword.QInterestKeyword.interestKeyword;
+import static com.query_dsl.query_dsl_tutorial.boundedContext.user.entity.QSiteUser.siteUser;
+
 // QueryDSL의 구현체
 @RequiredArgsConstructor
 public class UserRepositoryImpl implements UserRepositoryCustom {
@@ -142,13 +145,10 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
 
     @Override
     public List<SiteUser> getQslUserByInterestKeyword(String keyword) {
-        QSiteUser su = QSiteUser.siteUser;
-        QInterestKeyword suik = QInterestKeyword.interestKeyword;
-
         return queryFactory
-                .selectFrom(su)
-                .innerJoin(su.interestKeywords, suik) // INNER JOIN site_user_interest_keywords AS suik
-                .where(suik.keyword.eq(keyword)) // WHERE suik.keyword = keyword
+                .selectFrom(siteUser)
+                .innerJoin(siteUser.interestKeywords, interestKeyword) // INNER JOIN site_user_interest_keywords AS suik
+                .where(interestKeyword.keyword.eq(keyword)) // WHERE suik.keyword = keyword
                 .fetch();
     }
 }
