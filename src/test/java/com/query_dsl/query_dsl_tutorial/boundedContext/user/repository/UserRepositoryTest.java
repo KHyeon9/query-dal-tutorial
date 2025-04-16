@@ -222,4 +222,22 @@ class UserRepositoryTest {
         assertThat(findUser.getPassword()).isEqualTo("{noop}1234");
         assertThat(findUser.getEmail()).isEqualTo("user2@email.com");
     }
+
+    @Test
+    @DisplayName("QueryDSL 사용하지 않고, 테니스에 관심이 있는 회원 검색")
+    void noQueryDSLTennisUserFind() {
+        SiteUser user = userRepository.getQslUser(2L);
+        user.addInterestKeword("테니스");
+        userRepository.save(user);
+
+        List<SiteUser> users = userRepository.findByInterestKeywords_keyword("테니스");
+
+        assertThat(users.size()).isEqualTo(1);
+        SiteUser findUser = users.get(0);
+
+        assertThat(findUser.getId()).isEqualTo(2L);
+        assertThat(findUser.getUsername()).isEqualTo("user2");
+        assertThat(findUser.getPassword()).isEqualTo("{noop}1234");
+        assertThat(findUser.getEmail()).isEqualTo("user2@email.com");
+    }
 }
