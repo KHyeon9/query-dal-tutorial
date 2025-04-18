@@ -32,8 +32,16 @@ public class SiteUser {
     @ManyToMany(cascade = CascadeType.ALL)
     private Set<InterestKeyword> interestKeywords = new HashSet<>();
 
+    @Builder.Default
+    @ManyToMany(cascade = CascadeType.ALL)
+    private Set<SiteUser> followers = new HashSet<>();
+
     public void addInterestKeword(String keword) {
         // @Builder.Default가 없는 경우 add시 NullPointException이 발생함
         interestKeywords.add(new InterestKeyword(keword));
+    }
+
+    public void addFollower(SiteUser follower) {
+        followers.add(follower);
     }
 }

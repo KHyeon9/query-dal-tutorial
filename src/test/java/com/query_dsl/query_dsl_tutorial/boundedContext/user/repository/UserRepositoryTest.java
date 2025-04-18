@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -202,7 +203,7 @@ class UserRepositoryTest {
 
         userRepository.save(user);
 
-        assertThat(user.getInterestKeywords().size()).isEqualTo(3);
+        assertThat(user.getInterestKeywords().size()).isEqualTo(6);
     }
 
     @Test
@@ -239,5 +240,19 @@ class UserRepositoryTest {
         assertThat(findUser.getUsername()).isEqualTo("user2");
         assertThat(findUser.getPassword()).isEqualTo("{noop}1234");
         assertThat(findUser.getEmail()).isEqualTo("user2@email.com");
+    }
+
+    @Test
+    @DisplayName("user2 = 유튜버, user1 = 구독자일때, 팔로워시 조회")
+    @Rollback(false)
+    void followFind() {
+        SiteUser user1 = userRepository.getQslUser(1L);
+        SiteUser user2 = userRepository.getQslUser(2L);
+
+        user2.addFollower(user1);
+        userRepository.save(user2);
+
+        SiteUser findUser = userRepository.getQslUser(2L);
+        assertThat(findUser.getFollowers().size()).isEqualTo(1);
     }
 }
