@@ -24,8 +24,6 @@ public class TestInitData {
                     .email("user1@email.com")
                     .build();
 
-
-
             SiteUser user2 = SiteUser.builder()
                     .username("user2")
                     .password("{noop}1234")

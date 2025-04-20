@@ -44,4 +44,8 @@ public class SiteUser {
     public void addFollower(SiteUser follower) {
         followers.add(follower);
     }
+
+    public void follow(SiteUser following) {
+        following.getFollowers().add(this);
+    }
 }

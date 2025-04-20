@@ -249,8 +249,10 @@ class UserRepositoryTest {
         SiteUser user1 = userRepository.getQslUser(1L);
         SiteUser user2 = userRepository.getQslUser(2L);
 
-        user2.addFollower(user1);
-        userRepository.save(user2);
+        // user2.addFollower(user1);
+        // userRepository.save(user2);
+        user1.follow(user2);
+
 
         SiteUser findUser = userRepository.getQslUser(2L);
         assertThat(findUser.getFollowers().size()).isEqualTo(1);
